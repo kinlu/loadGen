@@ -1,32 +1,71 @@
 package com.example.loadGen;
 
 import com.example.loadGen.domain.TestInstance;
-import com.example.loadGen.domain.TestInstancePool;
 import com.example.loadGen.domain.TestSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
 public class TestService {
 
-  @Autowired
-  private TestInstancePool testInstancePool;
+  private HashMap<UUID, TestInstance> testInstancePool;
 
-  public HashMap<UUID, TestInstance> getTestInstances() {
-    return testInstancePool.getTestInstances();
+  private ExecutorService executorService;
+
+  private Future futureTestTask;
+
+  public TestService() {
+    this.testInstancePool = new HashMap<>();
+    this.executorService = Executors.newSingleThreadExecutor();
   }
 
-  public void newTestInstance(TestSession testSession) {
+  public HashMap<UUID, TestInstance> getTestInstances() {
+    return testInstancePool;
+  }
+
+  public TestInstance newTestInstance(TestSession testSession) {
     TestInstance newTestInstance = new TestInstance(testSession);
-    testInstancePool.getTestInstances().put(newTestInstance.getTestId(), newTestInstance);
+    testInstancePool.put(newTestInstance.getTestId(), newTestInstance);
+    futureTestTask = this.executorService.submit(new TestSessionExecutor(newTestInstance));
+    return newTestInstance;
   };
 
   public void deleteTestInstance(TestInstance testInstance){
-    testInstancePool.getTestInstances().remove(testInstance.getTestId());
+    testInstancePool.remove(testInstance.getTestId());
+    futureTestTask.cancel(true);
   }
+
+  private class TestSessionExecutor implements Runnable {
+
+    private TestInstance testInstance;
+
+    public TestSessionExecutor(TestInstance testInstance) {
+      this.testInstance = testInstance;
+    }
+
+    @Override
+    public void run() {
+      IntStream
+          .range(0, testInstance.getTestSession().getNumberOfMessages())
+//        .parallel()
+          .forEach(i -> {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            log.info("Operation: " + i);
+          });
+      testInstance.setStatus("Started");
+    }
+  }
+
 }

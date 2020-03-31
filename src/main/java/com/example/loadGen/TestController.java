@@ -20,8 +20,8 @@ public class TestController {
   }
 
   @PostMapping("/test")
-  void newTestInstance(@RequestBody TestSession testSession){
-    testService.newTestInstance(testSession);
+  TestInstance newTestInstance(@RequestBody TestSession testSession){
+    return testService.newTestInstance(testSession);
   };
 
   @GetMapping("/tests/{id}")
