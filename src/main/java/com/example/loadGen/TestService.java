@@ -32,15 +32,27 @@ public class TestService {
   }
 
   public TestInstance newTestInstance(TestSession testSession) {
+    if(testInstancePool
+        .entrySet()
+        .stream()
+        .anyMatch(instance
+            -> instance.getValue().getStatus() == "Open")){
+      return null;
+    }
     TestInstance newTestInstance = new TestInstance(testSession);
     testInstancePool.put(newTestInstance.getTestId(), newTestInstance);
+    log.info("Added a new test: " + newTestInstance.getTestId());
     futureTestTask = this.executorService.submit(new TestSessionExecutor(newTestInstance));
     return newTestInstance;
   };
 
-  public void deleteTestInstance(TestInstance testInstance){
-    testInstancePool.remove(testInstance.getTestId());
+  public void deleteTestInstance(TestInstance testInstance) throws InterruptedException {
+    log.info("Terminating " + testInstance.getTestId());
     futureTestTask.cancel(true);
+    while(!futureTestTask.isCancelled()) {
+      Thread.sleep(100);}
+    testInstancePool.remove(testInstance.getTestId());
+    log.info("Test " + testInstance.getTestId() + " is terminated and removed");
   }
 
   private class TestSessionExecutor implements Runnable {
@@ -55,16 +67,16 @@ public class TestService {
     public void run() {
       IntStream
           .range(0, testInstance.getTestSession().getNumberOfMessages())
-//        .parallel()
+          .parallel()
           .forEach(i -> {
             try {
               Thread.sleep(10000);
             } catch (InterruptedException e) {
-              e.printStackTrace();
             }
             log.info("Operation: " + i);
           });
-      testInstance.setStatus("Started");
+      testInstance.setStatus("Done");
+      log.info("Test " + testInstance.getTestId() + " is Done");
     }
   }
 
