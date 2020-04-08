@@ -37,15 +37,20 @@ public class TestController {
     return testService.getTestInstances().get(id);
   };
 
-  @DeleteMapping("tests/{id}")
+  @DeleteMapping("/tests/{id}")
   void deleteTestInstance(@PathVariable UUID id) throws InterruptedException {
     var testInstance = testService.getTestInstances().get(id);
     if(testInstance == null) {
-      log.warn("Test instance " + id + "can not be found!");
+      log.warn("Test instance " + id + " can not be found!");
       throw new TestInstanceNotFoundException();
     } else {
       testService.deleteTestInstance(testInstance);
     };
+  }
+
+  @DeleteMapping("/tests")
+  void deleteAllTestInstance() throws InterruptedException {
+    testService.resetService();
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason="The test instance is not found")

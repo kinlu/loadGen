@@ -55,6 +55,17 @@ public class TestService {
     log.info("Test " + testInstance.getTestId() + " is terminated and removed");
   }
 
+  public void resetService() throws InterruptedException {
+    if(this.futureTestTask != null){
+      this.futureTestTask.cancel(true);
+      while(!futureTestTask.isCancelled() && !futureTestTask.isDone()) {
+        Thread.sleep(100);
+      }
+    }
+    this.executorService = Executors.newSingleThreadExecutor();
+    this.testInstancePool = new HashMap<>();
+  }
+
   private class TestSessionExecutor implements Runnable {
 
     private TestInstance testInstance;
@@ -70,7 +81,7 @@ public class TestService {
           .parallel()
           .forEach(i -> {
             try {
-              Thread.sleep(10000);
+              Thread.sleep(5000);
             } catch (InterruptedException e) {
             }
             log.info("Operation: " + i);
