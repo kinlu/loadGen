@@ -38,7 +38,7 @@ public class TestController {
   };
 
   @DeleteMapping("/tests/{id}")
-  void deleteTestInstance(@PathVariable UUID id) throws InterruptedException {
+  void deleteTestInstance(@PathVariable UUID id) {
     var testInstance = testService.getTestInstances().get(id);
     if(testInstance == null) {
       log.warn("Test instance " + id + " can not be found!");
@@ -49,7 +49,7 @@ public class TestController {
   }
 
   @DeleteMapping("/tests")
-  void deleteAllTestInstance() throws InterruptedException {
+  void deleteAllTestInstance() {
     testService.resetService();
   }
 

@@ -36,7 +36,8 @@ public class TestServiceIntegrationTest {
   public void shouldCreateNewInstance(){
     var numberOfMessage = 10;
     var messageType = "ABC";
-    TestSession testSession = new TestSession(numberOfMessage, messageType);
+    var numberOfThread = 4;
+    TestSession testSession = new TestSession(numberOfMessage, messageType, numberOfThread);
     TestInstance testInstance = testService.newTestInstance(testSession);
     assertThat(testInstance.getTestId().toString()).isNotBlank();
     assertThat(testInstance.getStatus()).isEqualTo("Open");
@@ -48,7 +49,8 @@ public class TestServiceIntegrationTest {
   public void shouldHaveInstanceExecuted() throws InterruptedException {
     var numberOfMessage = 1;
     var messageType = "ABC";
-    TestSession testSession = new TestSession(numberOfMessage, messageType);
+    var numberOfThread = 4;
+    TestSession testSession = new TestSession(numberOfMessage, messageType, numberOfThread);
     TestInstance testInstance = testService.newTestInstance(testSession);
     assertThat(testInstance.getTestId().toString()).isNotBlank();
     Thread.sleep(11000);
@@ -59,7 +61,8 @@ public class TestServiceIntegrationTest {
   public void shouldGetTestInstances() {
     var numberOfMessage = 1;
     var messageType = "ABC";
-    TestSession testSession = new TestSession(numberOfMessage, messageType);
+    var numberOfThread = 1;
+    TestSession testSession = new TestSession(numberOfMessage, messageType, numberOfThread);
     TestInstance testInstance = testService.newTestInstance(testSession);
     assertThat(testService.getTestInstances().containsKey(testInstance.getTestId())).isTrue();
     assertThat(testService.getTestInstances().containsValue(testInstance)).isTrue();
@@ -69,7 +72,8 @@ public class TestServiceIntegrationTest {
   public void shouldDeleteTestInstance() throws InterruptedException {
     var numberOfMessage = 10;
     var messageType = "ABC";
-    TestSession testSession = new TestSession(numberOfMessage, messageType);
+    var numberOfThread = 1;
+    TestSession testSession = new TestSession(numberOfMessage, messageType, numberOfThread);
     TestInstance testInstance = testService.newTestInstance(testSession);
     testService.deleteTestInstance(testInstance);
     assertThat(testService.getTestInstances().isEmpty()).isTrue();

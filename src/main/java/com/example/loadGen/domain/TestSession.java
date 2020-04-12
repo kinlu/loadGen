@@ -12,4 +12,7 @@ public class TestSession {
 
   @Getter @Setter
   private String messageType;
+
+  @Getter @Setter
+  private int numberOfThreads;
 }

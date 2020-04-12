@@ -3,6 +3,7 @@ package com.example.loadGen;
 import com.example.loadGen.domain.TestInstance;
 import com.example.loadGen.domain.TestSession;
 import com.google.gson.Gson;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +36,14 @@ public class TestControllerIntegrationTest {
 
   @Before
   public void beforeTest() throws InterruptedException {
-    this.testSession = new TestSession(5, "abc");
+    this.testSession = new TestSession(5, "abc", 3);
     this.gson = new Gson();
     this.json = gson.toJson(testSession);
-    Thread.sleep(5000);
+  }
+
+  @After
+  public void afterTest() throws Exception {
+    mvc.perform(delete("/tests"));
   }
 
   @Test
