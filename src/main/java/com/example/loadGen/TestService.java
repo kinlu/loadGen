@@ -76,7 +76,7 @@ public class TestService {
     public void run() {
      for (int i = 0; i < testInstance.getTestSession().getNumberOfMessages(); i++) {
             try {
-              Thread.sleep(5000);
+              Thread.sleep(5000); // Simulating the test session execution logic
             } catch (InterruptedException e) {
               log.info("Executor " + executorId + " is interrupted!");
               break;
